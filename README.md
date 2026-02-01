@@ -13,7 +13,7 @@ Google discontinued POP3 support for Gmail sync. This solution provides a free, 
 ## ✨ Features
 
 ### Core Functionality
-- **Multi-Mailbox Support**: Sync unlimited IMAP mailboxes to a single Gmail account
+- **Multi-Mailbox Support**: Sync many ( see - Usage Scenarios ) IMAP mailboxes to a single Gmail account. ( only limited when trying to stay within free tier, theoretically unlimited otherwise )
 - **Safe Deletion**: Only deletes emails from source AFTER they're moved to Gmail trash
 - **State Tracking**: Uses Firestore to track which emails have been synced and deleted
 - **Deduplication**: Prevents duplicate imports using message UIDs
@@ -155,18 +155,27 @@ Google discontinued POP3 support for Gmail sync. This solution provides a free, 
 
 ### Prerequisites
 - Google Cloud account with billing enabled (free tier)
+   - see __Examples__ for more details
 - Siteground (or any IMAP) email account(s)
 - Gmail account to sync to
 
 ### Installation
 
-1. **Clone the repository**
+1. **Create Your own infrastructure repo**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/strachg/gmail-imap-sync.git
    cd gmail-imap-sync
+
+   mkdir gmail-imap-sync-infra
+   cd gmail-imap-sync-infra
+   git init gmail-imap-sync-infra
+   cp -r ../gmail-imap-sync/examples/infra .
    ```
 
 2. **Set up Google Cloud APIs**
+
+   This step requires the billing to be configured on your google cloud account. I also suggest putting cost alerts just in case you do start getting charged. Bill shock is never fun.
+
    ```bash
    gcloud config set project YOUR_PROJECT_ID
    gcloud services enable cloudfunctions.googleapis.com

@@ -182,6 +182,9 @@ Google discontinued POP3 support for Gmail sync. This solution provides a free, 
    gcloud services enable cloudscheduler.googleapis.com
    gcloud services enable firestore.googleapis.com
    gcloud services enable gmail.googleapis.com
+   gcloud services enable run.googleapis.com
+   gcloud services enable artifactregistry.googleapis.com
+   gcloud services enable cloudbuild.googleapis.com
    ```
 
 3. **Create Firestore database**

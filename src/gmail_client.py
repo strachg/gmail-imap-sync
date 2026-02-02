@@ -28,6 +28,7 @@ class GmailClient:
         """
         self.gmail_label = gmail_label
         self.service = None
+        self.label_id = None
         
     def connect(self) -> bool:
         """
@@ -45,6 +46,15 @@ class GmailClient:
             creds_data = json.loads(credentials_json)
             creds = Credentials.from_authorized_user_info(creds_data)
             self.service = build('gmail', 'v1', credentials=creds)
+            
+            # Resolve label ID if configured
+            if self.gmail_label:
+                self.label_id = self.get_label_id(self.gmail_label)
+                if not self.label_id:
+                    print(f"Error: Failed to resolve label ID for '{self.gmail_label}'. Aborting to prevent unlabeled import.")
+                    return False
+                print(f"Resolved label '{self.gmail_label}' to ID: {self.label_id}")
+            
             return True
             
         except Exception as e:
@@ -67,12 +77,15 @@ class GmailClient:
         
         try:
             # Encode message in base64url format
-            message_bytes = base64.urlsafe_b64encode(raw_email).decode()
+            message_bytes = base64.urlsafe_b64encode(raw_email).decode().rstrip('=')
             
             # Prepare message with optional label
             labels = []
-            if self.gmail_label:
-                labels.append(self.gmail_label)
+            # Add 'INBOX' to make messages appear in the main inbox view
+            labels = ['INBOX']
+            
+            if self.label_id:
+                labels.append(self.label_id)
             
             message = {
                 'raw': message_bytes,

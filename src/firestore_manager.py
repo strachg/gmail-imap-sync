@@ -6,6 +6,7 @@ Handles all Firestore database operations for state tracking.
 from datetime import datetime, timedelta
 from typing import Set, List, Dict
 from google.cloud import firestore
+from google.cloud.firestore import FieldFilter
 
 
 # Collections in Firestore
@@ -38,7 +39,7 @@ class FirestoreManager:
         """
         try:
             docs = self.db.collection(MESSAGES_COLLECTION)\
-                .where('mailbox_id', '==', self.mailbox_id)\
+                .where(filter=FieldFilter('mailbox_id', '==', self.mailbox_id))\
                 .select(['uid'])\
                 .stream()
             
@@ -97,8 +98,8 @@ class FirestoreManager:
         """
         try:
             docs = self.db.collection(MESSAGES_COLLECTION)\
-                .where('mailbox_id', '==', self.mailbox_id)\
-                .where('deleted_from_source', '==', False)\
+                .where(filter=FieldFilter('mailbox_id', '==', self.mailbox_id))\
+                .where(filter=FieldFilter('deleted_from_source', '==', False))\
                 .limit(limit)\
                 .stream()
             
@@ -145,14 +146,14 @@ class FirestoreManager:
         try:
             # Total synced messages
             total_docs = self.db.collection(MESSAGES_COLLECTION)\
-                .where('mailbox_id', '==', self.mailbox_id)\
+                .where(filter=FieldFilter('mailbox_id', '==', self.mailbox_id))\
                 .count()\
                 .get()
             
             # Deleted from source
             deleted_docs = self.db.collection(MESSAGES_COLLECTION)\
-                .where('mailbox_id', '==', self.mailbox_id)\
-                .where('deleted_from_source', '==', True)\
+                .where(filter=FieldFilter('mailbox_id', '==', self.mailbox_id))\
+                .where(filter=FieldFilter('deleted_from_source', '==', True))\
                 .count()\
                 .get()
             
@@ -190,8 +191,8 @@ def cleanup_old_records(days: int = 30) -> int:
         cutoff = datetime.utcnow() - timedelta(days=days)
         
         docs = db.collection(MESSAGES_COLLECTION)\
-            .where('deleted_from_source', '==', True)\
-            .where('deleted_at', '<', cutoff)\
+            .where(filter=FieldFilter('deleted_from_source', '==', True))\
+            .where(filter=FieldFilter('deleted_at', '<', cutoff))\
             .stream()
         
         count = 0
@@ -224,7 +225,7 @@ def get_global_stats() -> Dict:
         
         # Total deleted from source
         deleted_docs = db.collection(MESSAGES_COLLECTION)\
-            .where('deleted_from_source', '==', True)\
+            .where(filter=FieldFilter('deleted_from_source', '==', True))\
             .count()\
             .get()
         

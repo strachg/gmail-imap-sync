@@ -79,8 +79,6 @@ class GmailClient:
             # Encode message in base64url format
             message_bytes = base64.urlsafe_b64encode(raw_email).decode().rstrip('=')
             
-            # Prepare message with optional label
-            labels = []
             # Add 'INBOX' to make messages appear in the main inbox view
             labels = ['INBOX']
             

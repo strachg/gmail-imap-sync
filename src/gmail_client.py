@@ -79,8 +79,9 @@ class GmailClient:
             # Encode message in base64url format
             message_bytes = base64.urlsafe_b64encode(raw_email).decode().rstrip('=')
             
-            # Add 'INBOX' to make messages appear in the main inbox view
-            labels = ['INBOX']
+            # Add 'INBOX' to make messages appear in the main inbox view,
+            # and 'UNREAD' to ensure they are marked as new.
+            labels = ['INBOX', 'UNREAD']
             
             if self.label_id:
                 labels.append(self.label_id)

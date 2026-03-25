@@ -3,6 +3,7 @@ Gmail IMAP Sync - Sync Manager
 Manages the synchronization process for a single mailbox.
 """
 
+import os
 from typing import Dict, List, Optional
 from datetime import datetime
 
@@ -97,8 +98,14 @@ class EmailSyncManager:
         }
         
         # Get already synced message UIDs
-        synced_uids = self.firestore.get_synced_message_uids()
+        force_resync = os.environ.get('FORCE_RESYNC', 'false').lower() in ('true', '1', 'yes')
         
+        synced_uids = set()
+        if not force_resync:
+            synced_uids = self.firestore.get_synced_message_uids()
+        else:
+            print(f"[{self.mailbox_id}] FORCE_RESYNC enabled. All messages will be checked for sync.")
+
         # Fetch new messages from IMAP
         new_messages = self.imap_client.fetch_new_messages(
             synced_uids=synced_uids,
